@@ -1140,8 +1140,28 @@ function summarizeFileTool(args: unknown): string {
     return String(args);
   }
   const obj = args as Record<string, unknown>;
-  const path = safeTextFromRecord(obj, ["path", "file", "target", "source", "destination", "from", "to"]);
+  const path = safeTextFromRecord(obj, ["absolute_path", "absolutePath", "path", "file", "target", "source", "destination", "from", "to"]);
   return path || toCompactValue(obj) || toolTimelineText("missingArgs");
+}
+
+function summarizeReadFileTool(args: unknown): string {
+  if (!args) return toolTimelineText("missingArgs");
+  if (typeof args === "string") {
+    const text = args.trim();
+    return text || toolTimelineText("missingArgs");
+  }
+  if (typeof args !== "object") {
+    return String(args);
+  }
+  const obj = args as Record<string, unknown>;
+  const path = safeTextFromRecord(obj, ["absolute_path", "absolutePath", "path", "file"]);
+  const start = obj.start;
+  const count = obj.count;
+  return joinNonEmpty([
+    path,
+    start !== undefined && start !== null ? `start: ${String(start)}` : "",
+    count !== undefined && count !== null ? `count: ${String(count)}` : "",
+  ]) || toCompactValue(obj) || toolTimelineText("missingArgs");
 }
 
 function summarizeTodoTool(args: unknown): string {
@@ -1239,6 +1259,7 @@ function summarizeOperateTool(args: unknown): string {
 }
 
 function summarizeBuiltinTool(toolName: string, args: unknown): string {
+  if (toolName === "read_file") return summarizeReadFileTool(args);
   if (toolName === "todo") return summarizeTodoTool(args);
   if (toolName === "task") return summarizeTaskTool(args);
   if (toolName === "plan") return summarizePlanTool(args);
@@ -1278,6 +1299,9 @@ function toolCallSummaryText(toolCall: { name: string; argsText: string; status?
   const args = normalizeToolCallArgs(toolCall.argsText);
 
   if (internalToolNames.has(toolName)) {
+    if (toolName === "read_file") {
+      return summarizeReadFileTool(args);
+    }
     if (toolName === "apply_patch") return summarizeApplyPatchTool(args);
     if (toolName === "exec" || toolName === "shell_exec") return summarizeCommandTool(args);
     if (toolName.includes("file")) {
