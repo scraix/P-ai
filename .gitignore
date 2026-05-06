@@ -34,3 +34,4 @@ target/
 src-tauri/.cargo/
 relay_tool_probe/
 temp/
+release/windows/*.exe
