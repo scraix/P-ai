@@ -553,7 +553,7 @@ async fn quick_genai_chat(
         provider_api_keys: vec![api_key.to_string()],
         provider_key_cursor: 0,
         request_format: input.request_format,
-        allow_concurrent_requests: true,
+        concurrent_request_limit: 0,
         base_url: base_url.to_string(),
         api_key: api_key.to_string(),
         model: model.to_string(),

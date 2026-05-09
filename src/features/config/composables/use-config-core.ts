@@ -32,6 +32,11 @@ export function useConfigCore(options: UseConfigCoreOptions) {
     return Number.isFinite(parsed) ? parsed : DEFAULT_MAX_OUTPUT_TOKENS;
   }
 
+  function normalizeConcurrentRequestLimit(value: unknown): number {
+    const parsed = Math.round(Number(value ?? 0));
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+  }
+
   function defaultApiTools() {
     return defaultToolBindings();
   }
@@ -60,7 +65,7 @@ export function useConfigCore(options: UseConfigCoreOptions) {
       id: `api-provider-${seed}`,
       name: `API Provider ${options.config.apiProviders.length + 1}`,
       requestFormat: "openai",
-      allowConcurrentRequests: false,
+      concurrentRequestLimit: 0,
       enableText: true,
       enableImage: true,
       enableAudio: false,
@@ -84,7 +89,7 @@ export function useConfigCore(options: UseConfigCoreOptions) {
       id: `${provider.id}::${model.id}`,
       name: `${provider.name}/${model.model}`,
       requestFormat: normalizeApiRequestFormat(provider.requestFormat),
-      allowConcurrentRequests: !!provider.allowConcurrentRequests,
+      concurrentRequestLimit: normalizeConcurrentRequestLimit(provider.concurrentRequestLimit),
       enableText: provider.enableText,
       enableImage: model.enableImage,
       enableAudio: provider.enableAudio,
@@ -115,7 +120,7 @@ export function useConfigCore(options: UseConfigCoreOptions) {
           id: `api-provider-legacy-${index + 1}`,
           name: api.name,
           requestFormat: normalizeApiRequestFormat(api.requestFormat),
-          allowConcurrentRequests: !!api.allowConcurrentRequests,
+          concurrentRequestLimit: 0,
           enableText: !!api.enableText,
           enableImage: !!api.enableImage,
           enableAudio: !!api.enableAudio,
@@ -164,7 +169,7 @@ export function useConfigCore(options: UseConfigCoreOptions) {
         if (!draft) continue;
         provider.name = String(provider.name || "").trim() || provider.id;
         provider.requestFormat = normalizeApiRequestFormat(draft.requestFormat);
-        provider.allowConcurrentRequests = !!draft.allowConcurrentRequests;
+        provider.concurrentRequestLimit = normalizeConcurrentRequestLimit(draft.concurrentRequestLimit);
         provider.enableText = !!draft.enableText;
         provider.enableAudio = !!draft.enableAudio;
         provider.baseUrl = String(draft.baseUrl || "").trim();
@@ -204,7 +209,7 @@ export function useConfigCore(options: UseConfigCoreOptions) {
           id: `${provider.id}::${model.id}`,
           name: `${providerName}/${modelValue}`,
           requestFormat: normalizeApiRequestFormat(provider.requestFormat),
-          allowConcurrentRequests: !!provider.allowConcurrentRequests,
+          concurrentRequestLimit: normalizeConcurrentRequestLimit(provider.concurrentRequestLimit),
           enableText: !!provider.enableText,
           enableImage: !!model.enableImage,
           enableAudio: !!provider.enableAudio,
@@ -235,7 +240,7 @@ export function useConfigCore(options: UseConfigCoreOptions) {
         id: `${provider.id}::${model.id}`,
         name: `${provider.name}/${model.model}`,
         requestFormat: normalizeApiRequestFormat(provider.requestFormat),
-        allowConcurrentRequests: !!provider.allowConcurrentRequests,
+        concurrentRequestLimit: normalizeConcurrentRequestLimit(provider.concurrentRequestLimit),
         enableText: !!provider.enableText,
         enableImage: !!model.enableImage,
         enableAudio: !!provider.enableAudio,
@@ -308,7 +313,7 @@ export function useConfigCore(options: UseConfigCoreOptions) {
         id: provider.id,
         name: provider.name,
         requestFormat: normalizeApiRequestFormat(provider.requestFormat),
-        allowConcurrentRequests: !!provider.allowConcurrentRequests,
+        concurrentRequestLimit: normalizeConcurrentRequestLimit(provider.concurrentRequestLimit),
         enableText: !!provider.enableText,
         enableImage: (provider.models || []).some((model) => !!model.enableImage),
         enableAudio: !!provider.enableAudio,
@@ -346,7 +351,7 @@ export function useConfigCore(options: UseConfigCoreOptions) {
         id: a.id,
         name: a.name,
         requestFormat: normalizeApiRequestFormat(a.requestFormat),
-        allowConcurrentRequests: !!a.allowConcurrentRequests,
+        concurrentRequestLimit: normalizeConcurrentRequestLimit(a.concurrentRequestLimit),
         enableText: !!a.enableText,
         enableImage: !!a.enableImage,
         enableAudio: !!a.enableAudio,

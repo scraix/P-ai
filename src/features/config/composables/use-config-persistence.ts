@@ -21,6 +21,11 @@ type TrFn = (key: string, params?: Record<string, unknown>) => string;
 
 export type ConfigSaveErrorKind = "hotkey_conflict" | "backend_404" | "unknown";
 
+function normalizeConcurrentRequestLimit(value: unknown): number {
+  const parsed = Math.round(Number(value ?? 0));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
 export type ConfigSaveErrorInfo = {
   kind: ConfigSaveErrorKind;
   errorText: string;
@@ -316,7 +321,7 @@ export function useConfigPersistence(options: UseConfigPersistenceOptions) {
           id: String((provider as { id?: unknown }).id || "").trim(),
           name: String((provider as { name?: unknown }).name || "").trim(),
           requestFormat: normalizeApiRequestFormat((provider as { requestFormat?: unknown }).requestFormat),
-          allowConcurrentRequests: !!(provider as { allowConcurrentRequests?: unknown }).allowConcurrentRequests,
+          concurrentRequestLimit: normalizeConcurrentRequestLimit((provider as { concurrentRequestLimit?: unknown }).concurrentRequestLimit),
           enableText: !!(provider as { enableText?: unknown }).enableText,
           enableImage: !!(provider as { enableImage?: unknown }).enableImage,
           enableAudio: !!(provider as { enableAudio?: unknown }).enableAudio,

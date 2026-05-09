@@ -383,8 +383,8 @@ struct ApiProviderConfig {
     name: String,
     #[serde(default = "default_request_format")]
     request_format: RequestFormat,
-    #[serde(default = "default_false")]
-    allow_concurrent_requests: bool,
+    #[serde(default)]
+    concurrent_request_limit: u32,
     #[serde(default = "default_true")]
     enable_text: bool,
     #[serde(default = "default_false")]
@@ -418,7 +418,7 @@ impl Default for ApiProviderConfig {
             id: "default-provider-openai".to_string(),
             name: "Default OpenAI".to_string(),
             request_format: RequestFormat::OpenAI,
-            allow_concurrent_requests: false,
+            concurrent_request_limit: 0,
             enable_text: true,
             enable_image: false,
             enable_audio: false,
@@ -447,8 +447,8 @@ struct ApiConfig {
     name: String,
     #[serde(default = "default_request_format")]
     request_format: RequestFormat,
-    #[serde(default = "default_false")]
-    allow_concurrent_requests: bool,
+    #[serde(default)]
+    concurrent_request_limit: u32,
     #[serde(default = "default_true")]
     enable_text: bool,
     #[serde(default = "default_false")]
@@ -591,7 +591,7 @@ impl Default for ApiConfig {
             id: "default-openai".to_string(),
             name: "Default OpenAI".to_string(),
             request_format: RequestFormat::OpenAI,
-            allow_concurrent_requests: false,
+            concurrent_request_limit: 0,
             enable_text: true,
             enable_image: false,
             enable_audio: false,

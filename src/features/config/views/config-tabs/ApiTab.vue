@@ -72,12 +72,18 @@
               </label>
             </div>
 
-            <label class="flex items-start justify-between gap-3 rounded-box border border-base-300 bg-base-200/70 px-3 py-3">
+            <label class="flex items-center justify-between gap-3 rounded-box border border-base-300 bg-base-200/70 px-3 py-3">
               <div class="flex flex-col gap-1">
-                <span class="text-sm font-medium">{{ t("config.api.allowConcurrentRequests") }}</span>
-                <span class="text-xs opacity-65">{{ t("config.api.allowConcurrentRequestsHint") }}</span>
+                <span class="text-sm font-medium">{{ t("config.api.concurrentRequestLimit") }}</span>
+                <span class="text-xs opacity-65">{{ t("config.api.concurrentRequestLimitHint") }}</span>
               </div>
-              <input v-model="selectedProvider.allowConcurrentRequests" type="checkbox" class="toggle toggle-sm mt-0.5" />
+              <input
+                v-model.number="selectedProvider.concurrentRequestLimit"
+                type="number"
+                min="0"
+                step="1"
+                class="input input-bordered input-sm w-24 text-right"
+              />
             </label>
 
             <div v-if="!selectedProviderIsCodex" class="flex flex-col gap-1">
@@ -643,12 +649,17 @@ function capabilityFromRequestFormat(format: ApiRequestFormat | string): ApiCapa
   return "text";
 }
 
+function normalizeConcurrentRequestLimit(value: unknown): number {
+  const parsed = Math.round(Number(value ?? 0));
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
 function cloneProvider(provider: ApiProviderConfigItem): ApiProviderConfigItem {
   return {
     id: String(provider.id || "").trim(),
     name: String(provider.name || "").trim(),
     requestFormat: normalizeApiRequestFormat(provider.requestFormat),
-    allowConcurrentRequests: !!provider.allowConcurrentRequests,
+    concurrentRequestLimit: normalizeConcurrentRequestLimit(provider.concurrentRequestLimit),
     enableText: !!provider.enableText,
     enableImage: !!provider.enableImage,
     enableAudio: !!provider.enableAudio,
@@ -693,7 +704,7 @@ function normalizeProviderForCompare(provider: ApiProviderConfigItem) {
     id: String(provider.id || "").trim(),
     name: String(provider.name || "").trim(),
     requestFormat: normalizeApiRequestFormat(provider.requestFormat),
-    allowConcurrentRequests: !!provider.allowConcurrentRequests,
+    concurrentRequestLimit: normalizeConcurrentRequestLimit(provider.concurrentRequestLimit),
     enableText: !!provider.enableText,
     enableImage: !!provider.enableImage,
     enableAudio: !!provider.enableAudio,
@@ -802,7 +813,7 @@ function createProvider(seed: string, capability: ApiCapability = activeCapabili
     id: `api-provider-${seed}`,
     name: `API Provider ${providerList.value.length + 1}`,
     requestFormat,
-    allowConcurrentRequests: false,
+    concurrentRequestLimit: 0,
     enableText: capability === "text",
     enableImage: false,
     enableAudio: capability === "voice",

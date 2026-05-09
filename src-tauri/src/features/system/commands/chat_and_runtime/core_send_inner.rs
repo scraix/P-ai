@@ -3326,7 +3326,7 @@ mod core_send_inner_tests {
             id: id.to_string(),
             name: id.to_string(),
             request_format: RequestFormat::OpenAI,
-            allow_concurrent_requests: false,
+            concurrent_request_limit: 0,
             enable_text: true,
             enable_image,
             enable_audio: false,
